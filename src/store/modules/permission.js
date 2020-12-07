@@ -50,7 +50,7 @@ const permission = {
       return new Promise(resolve => {
         const { roles } = data
         let accessedRoutes
-        if (roles.includes('admin')) {
+        if (roles.includes('超级管理员')) {
           accessedRoutes = asyncRoutes
         } else {
           accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
