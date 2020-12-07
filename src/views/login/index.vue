@@ -527,7 +527,7 @@
     width: 100%;
     height:100%;
     min-width: 1200px;
-    background: url("../../assets/bg/background.png")no-repeat;
+    background: url("../../assets/bg.jpg")no-repeat;
     background-size: 100% 100%;
     background-position: center 0;
   }
