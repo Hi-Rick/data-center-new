@@ -1,280 +1,240 @@
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <el-col :span="4" :xs="24">
-        <div class="head-container" style="margin-bottom: 0.5rem">
-          <!--          <el-input v-model="filterText" placeholder="请输入部门名称" clearable size="small" prefix-icon="el-icon-search"-->
-          <!--                    style="margin-bottom: 20px"/>-->
-          <!--          <el-col :span="1.5">-->
-          <el-button icon="el-icon-plus" size="mini" @click="addTree" plain round>新增</el-button>
-          <!--          </el-col>-->
+      <el-col :span="5" :xs="24" class="leftColumn">
+        <div style="margin-bottom: 0.5rem">
+          <el-button type="success" icon="el-icon-plus" size="mini" @click="addTree" round>新增</el-button>
+          <el-button type="primary" icon="el-icon-edit" size="mini" v-if="!showEditAssets"
+                     @click="showEditAssets = true" round>编辑
+          </el-button>
+          <el-button type="danger" icon="el-icon-check" size="mini" v-else @click="showEditAssets = false" plain round>
+            完成
+          </el-button>
         </div>
-        <div class="head-container">
-          <el-tree
-            class="filter-tree"
-            :data="deptOptions"
-            :props="defaultProps"
-            default-expand-all
-            :filter-node-method="filterNode"
-            ref="tree">
-          </el-tree>
+        <div v-show="showEditAssets === false">
+          <el-table :data="deptOptions" :show-header="false" @row-click="clickRow" style="cursor: pointer; ">
+            <el-table-column prop="assetSource" :show-overflow-tooltip="true"></el-table-column>
+          </el-table>
+        </div>
+        <div v-show="showEditAssets === true">
+          <el-table :data="deptOptions" :show-header="false" @row-click="clickRow" style="cursor: pointer; ">
+            <el-table-column prop="assetSource" :show-overflow-tooltip="true"></el-table-column>
+            <el-table-column width="85px">
+              <template slot-scope="scope">
+                <el-button type="warning" icon="el-icon-edit" size="mini" circle
+                           @click="editAsset(scope.row)"></el-button>
+                <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteAsset(scope.row)"
+                           circle></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </el-col>
-      <el-col :span="20" :xs="24">
-        <div>
-          <span style="font-size: 14px;color: #606266;font-weight: 700;margin-right: 10px">数据表名</span>
-          <el-input placeholder="请输入资源名称" clearable size="small" style="width: 200px;margin-right: 30px"/>
-          <span style="font-size: 14px;color: #606266;font-weight: 700;margin-right: 10px">数据状态</span>
-          <el-select v-model="value" placeholder="请选择" style="margin-right: 40px">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-          <el-button type="cyan" icon="el-icon-search" size="mini">搜索</el-button>
-          <!--          <el-button icon="el-icon-refresh" size="mini">重置</el-button>-->
+      <el-col :span="19" :xs="24">
+        <div style="float: left; ">
+          <el-button :loading="downloadLoading" type="warning" icon="el-icon-download"
+                     @click="handleDownload">导出
+          </el-button>
         </div>
-
-        <el-row :gutter="10" style="margin-top: 20px">
-          <!--          <el-col :span="1.5">-->
-          <!--            <el-button type="primary" icon="el-icon-plus" size="mini" @click="addinfo">新增</el-button>-->
-          <!--          </el-col>-->
-          <!--          <el-col :span="1.5">-->
-          <!--            <el-button type="success" icon="el-icon-edit" size="mini" :disabled="single">修改</el-button>-->
-          <!--          </el-col>-->
-          <!--          <el-col :span="1.5">-->
-          <!--            <el-button type="danger" icon="el-icon-delete" size="mini" :disabled="multiple">删除</el-button>-->
-          <!--          </el-col>-->
-          <!--          <el-col :span="1.5">-->
-          <!--            <el-button type="info" icon="el-icon-upload2" size="mini">导入</el-button>-->
-          <!--          </el-col>-->
-          <el-col :span="1.5">
-            <el-button :loading="downloadLoading" type="warning" icon="el-icon-download" size="mini"
-                       @click="handleDownload">导出
-            </el-button>
-          </el-col>
-        </el-row>
-
-        <el-table v-loading="loading"
-                  :data="resourceList.slice((queryParams.pageNum-1)*queryParams.pageSize,queryParams.pageNum*queryParams.pageSize)">
-          <!--          <el-table-column type="selection" width="15" align="center"/>-->
-          <el-table-column width="15" align="center"/>
+        <div style="float: right; ">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item label="数据含义">
+              <el-input placeholder="请输入资源名称" v-model="filterForm.dataMeaning" clearable/>
+            </el-form-item>
+            <el-form-item label="数据状态">
+              <el-select v-model="filterForm.state" placeholder="请选择">
+                <el-option
+                  v-for="(item, index) in options"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" plain icon="el-icon-search" @click="doFilter" circle></el-button>
+              <el-button type="success" plain icon="el-icon-refresh" @click="refreshList" circle></el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-table v-loading="loading" :data="resourceList.slice((currentPage - 1) * pagesize, currentPage * pagesize)">
+          <el-table-column width="50px" align="center">
+            <template slot-scope="scope">
+              {{ scope.$index + (currentPage - 1) * pagesize + 1 }}
+            </template>
+          </el-table-column>
           <el-table-column label="数据编号" align="center" prop="dataCode"/>
           <el-table-column label="数据表名" align="center" prop="dataName"/>
           <el-table-column label="数据含义" align="center" prop="dataMeaning" :show-overflow-tooltip="true"/>
           <el-table-column label="所属部门" align="center" prop="dept"/>
-          <el-table-column label="创建时间" align="center" prop="createTime">
-          </el-table-column>
-          <el-table-column label="更新时间" align="center" prop="updateTime">
-            <!--            <template slot-scope="scope">-->
-            <!--              <span>{{ updateTime) }}</span>-->
-            <!--            </template>-->
-          </el-table-column>
+          <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
+          <el-table-column label="更新时间" align="center" prop="updateTime"></el-table-column>
           <el-table-column label="数据状态" align="center" prop="state">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.state" type="success">发布</el-tag>
-              <el-tag v-if="!scope.row.state" type="danger">停用</el-tag>
+              <el-tag v-else type="danger">停用</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" width="90px" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addinfo(scope.row)">修改
               </el-button>
-              <el-button v-if="scope.row.userId !== 1" size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
-              <!--              <el-button size="mini" type="text" icon="el-icon-key" @click="handleResetPwd(scope.row)"-->
-              <!--                        >重置-->
-              <!--              </el-button>-->
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum"
-                    :limit.sync="queryParams.pageSize"/>
-
+        <div style="text-align: center; margin-top: 10px; ">
+          <el-pagination
+            background
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-size="pagesize"
+            layout="total,prev,pager,next"
+            :total="resourceList.length">
+          </el-pagination>
+        </div>
       </el-col>
     </el-row>
-    <div>
-      <el-dialog :visible.sync="openinfo" title="修改数据表">
-        <el-form ref="form" :model="form" label-width="100px">
-          <el-form-item label="数据编号">
-            <el-input v-model="form.name"/>
-          </el-form-item>
-          <el-form-item label="数据表名">
-            <el-input v-model="form.companies"/>
-          </el-form-item>
-          <el-form-item label="数据含义">
-            <el-input v-model="form.work"/>
-          </el-form-item>
-          <el-form-item label="所属部门">
-            <el-input v-model="form.work"/>
-          </el-form-item>
-          <el-form-item label="创建时间">
-            <el-col :span="11">
-              <el-date-picker v-model="form.btime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"
-                              placeholder="选择日期" style="width: 60%;"/>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="更新时间">
-            <el-col :span="11">
-              <el-date-picker v-model="form.btime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"
-                              placeholder="选择日期" style="width: 60%;"/>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="数据状态">
-            <el-select v-model="form.state" placeholder="请选择" style="margin-right: 40px">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="openinfo = false">取 消</el-button>
-          <el-button type="primary" @click="submit">确 定</el-button>
-        </div>
-      </el-dialog>
-    </div>
-
-
+    <el-dialog :visible.sync="openinfo" title="修改数据表">
+      <el-form ref="form" :model="currentRow" label-width="100px">
+        <el-form-item label="数据编号">
+          <el-input v-model="currentRow.dataCode" disabled style="width: 80%; "/>
+        </el-form-item>
+        <el-form-item label="数据表名">
+          <el-input v-model="currentRow.dataName" disabled style="width: 80%; "/>
+        </el-form-item>
+        <el-form-item label="数据含义">
+          <el-input v-model="currentRow.dataMeaning" style="width: 80%; "/>
+        </el-form-item>
+        <el-form-item label="所属部门">
+          <el-select v-model="currentRow.dept" style="width: 300px; ">
+            <el-option v-for="(item, index) in deptOptions" :key="index" :value="item.assetSource"
+                       :label="item.assetSource"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-col :span="11">
+            <el-date-picker v-model="currentRow.createTime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"
+                            placeholder="选择日期" style="width: 300px;" disabled/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="更新时间">
+          <el-col :span="11">
+            <el-date-picker v-model="currentRow.updateTime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"
+                            placeholder="选择日期" style="width: 300px;"/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="数据状态">
+          <el-select v-model="currentRow.state" placeholder="请选择" style="width: 300px;">
+            <el-option
+              v-for="(item, index) in options"
+              :key="index"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div style="text-align: center; ">
+        <el-button type="primary" @click="submit">确定</el-button>
+        <el-button @click="openinfo = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {getAllAsset, getTreeList} from '@/api/index'
-import pagination from "@/components/Pagination/index"
-import {fetchList} from "@/api/article";
 import {parseTime} from "@/utils";
+import {
+  addAssetTree,
+  deleteAssetTree,
+  getAllAsset,
+  getAssetByDept,
+  getFilterAsset,
+  getTreeList, updateAsset,
+  updateAssetTree
+} from "../../../api";
 
 export default {
   name: 'Assetmanage',
-  components: {pagination},
   data() {
     return {
-      deptOptions: undefined,
+      currentPage: 1,  // 当前页码
+      pagesize: 10,  // 每页显示的行数
+      deptOptions: [],
       defaultProps: {
         children: "children",
         label: "assetSource",
       },
+      showEditAssets: false,
       downloadLoading: false,
       openinfo: false,
-      title: '',
-      filterText: '',
-      form: {},
-      single: true,
-      multiple: true,
       resourceList: [],
       loading: true,
-      queryParams: {
-        pageSize: 10,
-        pageNum: 1,
-      },
-      total: 0,
-      options: [{
-        value: '1',
-        label: '发布'
-      }, {
-        value: '0',
-        label: '停用'
-      }],
-      value: '',
-      data: [{
-        id: 1,
-        label: '水资源科',
-        children: [{
-          id: 4,
-          label: '办公厅',
-          children: [{
-            id: 9,
-            label: '1号'
-          }, {
-            id: 10,
-            label: '2号'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '水文水资源勘探局',
-        children: [{
-          id: 5,
-          label: '办公厅'
-        }, {
-          id: 6,
-          label: '人事司'
-        }]
-      }, {
-        id: 3,
-        label: '财务审计科',
-        children: [{
-          id: 7,
-          label: '财务司'
-        }, {
-          id: 8,
-          label: '人事司'
-        }]
-      },
+      options: [
         {
-          id: 3,
-          label: '水政监察大队',
-          children: [{
-            id: 7,
-            label: '一队'
-          }, {
-            id: 8,
-            label: '二队'
-          }]
-        }],
+          value: true,
+          label: '发布'
+        },
+        {
+          value: false,
+          label: '停用'
+        }
+      ],
+      filterForm: {
+        dataMeaning: '',
+        state: ''
+      },
+      currentRow: {
+        "createTime": "",
+        "dataCode": "",
+        "dataMeaning": "",
+        "dataName": "",
+        "dept": "",
+        "id": null,
+        "state": true,
+        "updateTime": ""
+      }
     };
   },
   mounted() {
-    this.getTree()
-    this.getlist()
+    this.getTree();
+    this.getlist();
   },
-  watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
-    }
-  },
-
   methods: {
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
-    },
-    handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.userId);
-      this.single = selection.length != 1;
-      this.multiple = !selection.length;
-    },
-    addinfo() {
-      this.openinfo = true
+    addinfo(row) {
+      this.openinfo = true;
+      this.currentRow = row;
     },
     submit() {
-      this.openinfo = false
-      this.$message({
-        type: 'success',
-        message: '提交成功'
+      updateAsset(this.currentRow).then(response => {
+        if (response.data.code === 200) {
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          });
+          this.getlist();
+          this.openinfo = false;
+        } else {
+          this.$message.error('修改失败');
+        }
       })
     },
     getTree() {
-      getTreeList().then(res => {
-        console.log('1',res)
-        this.deptOptions = res.data.data;
+      getTreeList().then(response => {
+        if (response.data.code === 200) {
+          this.deptOptions = response.data.data;
+        }
       })
     },
     getlist() {
       this.loading = true
       getAllAsset().then(response => {
-        console.log('2',response)
-        this.resourceList = response.data.data
-        this.total = this.resourceList.length
-        this.loading = false
-        // console.log(this.resourceList)
+        if (response.data.code === 200) {
+          this.resourceList = response.data.data
+          this.total = this.resourceList.length
+        }
+        this.loading = false;
       })
-
     },
     handleDownload() {
       this.downloadLoading = true
@@ -303,41 +263,112 @@ export default {
       }))
     },
     addTree() {
-
+      this.$prompt('请输入新增部门名称：', '新增部门', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({value}) => {
+        if (value.trim() !== '') {
+          addAssetTree({
+            "assetSource": value
+          }).then(response => {
+            if (response.data.code === 200) {
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              });
+              this.getTree();
+            }
+          })
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消提交'
+        });
+      });
     },
-
+    clickRow(row, column, event) {
+      getAssetByDept({
+        dept: row.assetSource
+      }).then(response => {
+        if (response.data.code === 200) {
+          this.resourceList = response.data.data;
+        }
+      })
+    },
+    deleteAsset(row) {
+      console.log(row.id);
+      this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAssetTree(row.id).then(response => {
+          if (response.data.code === 200) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.getTree();
+          }
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    editAsset(row) {
+      this.$prompt('请输入新的部门名称：', '修改部门名称', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputValue: row.assetSource
+      }).then(({value}) => {
+        if (value.trim() !== '') {
+          var currentRow = row;
+          currentRow['assetSource'] = value;
+          updateAssetTree(currentRow).then(response => {
+            if (response.data.code === 200) {
+              this.$message({
+                type: 'success',
+                message: '修改成功'
+              });
+              this.getTree();
+            }
+          })
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消修改'
+        });
+      });
+    },
+    refreshList() {
+      this.filterForm = {
+        dataMeaning: '',
+        state: ''
+      };
+      this.getlist();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+    },
+    doFilter() {
+      getFilterAsset(this.filterForm).then(response => {
+        if (response.data.code === 200) {
+          this.resourceList = response.data.data;
+        }
+      })
+    }
   },
-
-
 }
 </script>
 
 <style scoped>
-.el-col {
-  border-radius: 4px;
-}
-
-.bg-purple-dark {
-  background: #99a9bf;
-}
-
-.bg-purple {
-  background: #d3dce6;
-}
-
-.bg-purple-light {
-  background: #e5e9f2;
-}
-
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
-
-}
-
-.row-bg {
-  padding: 10px 0;
-  background-color: #f9fafc;
+.leftColumn .el-button + .el-button {
+  margin-left: 2px;
 }
 </style>
 

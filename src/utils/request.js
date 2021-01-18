@@ -72,10 +72,10 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-export function get(url,params){
-  return service.get(url,{ params })
-}
-export function post (url,params){
-  return service.post(url,params)
-}
+// export function get(url,params){
+//   return service.get(url,{ params })
+// }
+// export function post (url,params){
+//   return service.post(url,params)
+// }
 export default service

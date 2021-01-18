@@ -1,6 +1,64 @@
-import {get,post} from  '@/utils/request'
+import request from  '@/utils/request'
 
-export let getAllAsset = (query)=> get('http://222.173.76.3:65001/smartwater/data/data_asset/getAllAssetList',query)
+// 查询资产目录
+export function getTreeList() {
+  return request({
+    url: '/smartwater/data/data_asset/getAssetTreeList',
+    method: 'get',
+  })
+}
 
-export let getTreeList = (query)=> get('http://222.173.76.3:65001/smartwater/data/data_asset/getAssetTreeList',query)
+// 查询所有数据资产
+export function getAllAsset() {
+  return request({
+    url: '/smartwater/data/data_asset/getAllAssetList',
+    method: 'get',
+  })
+}
 
+export function getAssetByDept(data) {
+  return request({
+    url: `/smartwater/data/data_asset/getAssetListByDept`,
+    method: 'get',
+    params: data
+  })
+}
+
+export function addAssetTree(data) {
+  return request({
+    url: '/smartwater/data/data_asset/addAssetTreeList',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAssetTree(id) {
+  return request({
+    url: `/smartwater/data/data_asset/updateAssetTreeList/${id}`,
+    method: 'delete'
+  })
+}
+
+export function updateAssetTree(data) {
+  return request({
+    url: `/smartwater/data/data_asset/updateAssetTreeList`,
+    method: 'post',
+    data
+  })
+}
+
+export function getFilterAsset(data) {
+  return request({
+    url: '/smartwater/data/data_asset/getAssetListByDataMeaningAndState',
+    method: 'get',
+    params: data
+  })
+}
+
+export function updateAsset(data) {
+  return request({
+    url: '/smartwater/data/data_asset/updateAssetInfo',
+    method: 'post',
+    data
+  })
+}
