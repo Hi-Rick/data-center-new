@@ -161,10 +161,6 @@ export default {
       currentPage: 1,  // 当前页码
       pagesize: 10,  // 每页显示的行数
       deptOptions: [],
-      defaultProps: {
-        children: "children",
-        label: "assetSource",
-      },
       showEditAssets: false,
       downloadLoading: false,
       openinfo: false,

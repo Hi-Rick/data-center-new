@@ -62,3 +62,11 @@ export function updateAsset(data) {
     data
   })
 }
+
+export function getAssetQuality(data) {
+  return request({
+    url: '/smartwater/data/data_asset/getAssetQualityByTableName',
+    method: 'get',
+    params: data
+  })
+}
