@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
+import {getDataCategory} from "../../../../api";
 
 export default {
   mixins: [resize],
@@ -25,12 +26,13 @@ export default {
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      seriesData: []
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.initChart()
+      this.getChartData();
     })
   },
   beforeDestroy() {
@@ -41,6 +43,21 @@ export default {
     this.chart = null
   },
   methods: {
+    getChartData() {
+      this.seriesData = [];
+      getDataCategory().then(response => {
+        if (response.data.code === 200) {
+          let list = response.data.data;
+          for (let item of list) {
+            this.seriesData.push({
+              name: item.dataCategory,
+              value: item.nums
+            })
+          }
+          this.initChart();
+        }
+      })
+    },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
 
@@ -54,26 +71,18 @@ export default {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-          data: ['行政区划数据', '堤防数据', '河道防洪数据', '检测站数据', '泵站数据','流域数据','水库数据']
-        },
+        // legend: {
+        //   orient: 'vertical',
+        //   left: 'left',
+        //   data: ['行政区划数据', '堤防数据', '河道防洪数据', '检测站数据', '泵站数据','流域数据','水库数据']
+        // },
         series: [
           {
             name: '水利基本数据',
             type: 'pie',
             radius: '55%',
             center: ['50%', '60%'],
-            data: [
-              {value: 335, name: '行政区划数据'},
-              {value: 310, name: '堤防数据'},
-              {value: 800, name: '河道防洪数据'},
-              {value: 635, name: '检测站数据'},
-              {value: 432, name: '泵站数据'},
-              {value: 300, name: '流域数据'},
-              {value: 135, name: '水库数据'},
-            ],
+            data: this.seriesData,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -84,9 +93,6 @@ export default {
           }
         ]
       })
-
-
-
     }
   }
 }

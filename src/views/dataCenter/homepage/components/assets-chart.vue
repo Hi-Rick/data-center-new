@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
+import {getAssetFirst} from "../../../../api";
 
 export default {
   mixins: [resize],
@@ -25,12 +26,14 @@ export default {
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      legendName: [],
+      seriesData: []
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.initChart()
+      this.getPieData()
     })
   },
   beforeDestroy() {
@@ -41,6 +44,23 @@ export default {
     this.chart = null
   },
   methods: {
+    getPieData() {
+      this.legendName = [];
+      this.seriesData = [];
+      getAssetFirst().then(response => {
+        if (response.data.code === 200) {
+          let list = response.data.data;
+          for(let item of list) {
+            this.legendName.push(item.data.assetSource);
+            this.seriesData.push({
+              name: item.data.assetSource,
+              value: item.nums
+            });
+          }
+          this.initChart();
+        }
+      })
+    },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
 
@@ -53,11 +73,11 @@ export default {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        legend: {
-          left: 'center',
-          top: 'bottom',
-          data: ['外部数据', '内部数据', '指标库', '数据源', '主数据']
-        },
+        // legend: {
+        //   left: 'center',
+        //   top: 'bottom',
+        //   data: this.legendName
+        // },
         toolbox: {
           show: true,
           feature: {
@@ -78,20 +98,14 @@ export default {
             radius: [30, 110],
             center: ['50%', '50%'],
             roseType: 'area',
-            data: [
-              {value: 10, name: '外部数据'},
-              {value: 5, name: '内部数据'},
-              {value: 15, name: '指标库'},
-              {value: 25, name: '数据源'},
-              {value: 20, name: '主数据'},
-            ]
+            data: this.seriesData
           }
         ]
       })
 
 
 
-    }
+    },
   }
 }
 </script>
