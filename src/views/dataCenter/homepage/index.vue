@@ -1,10 +1,10 @@
 <template>
   <div class="dashboard-editor-container">
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
+    <panel-group @handleSetLineChartData="handleSetLineChartData"/>
     <div v-if="type=='newVisitis'">
-    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <line-chart :chart-data="lineChartData" />
-    </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <line-chart :chart-data="lineChartData"/>
+      </el-row>
     </div>
     <div v-if="type=='messages'">
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
@@ -19,75 +19,75 @@
     <el-row :gutter="32">
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
-<!--          <raddar-chart />-->
-          <line-chart :chart-data="lineChartData" />
+          <!--          <raddar-chart />-->
+          <line-chart :chart-data="lineChartData"/>
         </div>
 
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
-          <pie-chart />
+          <pie-chart/>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
-<!--          <bar-chart />-->
+          <!--          <bar-chart />-->
           <assets-chart/>
         </div>
       </el-col>
     </el-row>
-    <panel-group2 @handleSetLineChartData2="handleSetLineChartData2" />
-<!--    <div v-if="type=='sharetop'">-->
-<!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-<!--        <SharetopChart/>-->
-<!--      </el-row>-->
-<!--    </div>-->
-<!--    <div v-if="type=='todo'">-->
-<!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-<!--        <line-chart :chart-data="lineChartData" />-->
-<!--      </el-row>-->
-<!--    </div>-->
-<!--    <div v-if="type=='usecount'">-->
-<!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-<!--        <resource-chart/>-->
-<!--      </el-row>-->
-<!--    </div>-->
-<!--    <div v-if="type=='topcount'">-->
-<!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-<!--        <resource-chart/>-->
-<!--      </el-row>-->
-<!--    </div>-->
+    <panel-group2 @handleSetLineChartData2="handleSetLineChartData2"/>
+    <!--    <div v-if="type=='sharetop'">-->
+    <!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
+    <!--        <SharetopChart/>-->
+    <!--      </el-row>-->
+    <!--    </div>-->
+    <!--    <div v-if="type=='todo'">-->
+    <!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
+    <!--        <line-chart :chart-data="lineChartData" />-->
+    <!--      </el-row>-->
+    <!--    </div>-->
+    <!--    <div v-if="type=='usecount'">-->
+    <!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
+    <!--        <resource-chart/>-->
+    <!--      </el-row>-->
+    <!--    </div>-->
+    <!--    <div v-if="type=='topcount'">-->
+    <!--      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
+    <!--        <resource-chart/>-->
+    <!--      </el-row>-->
+    <!--    </div>-->
     <el-row :gutter="32">
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
           <!--          <raddar-chart />-->
-<!--          <todo-list />-->
+          <!--          <todo-list />-->
           <task-status/>
         </div>
 
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
-        <data-use-chart/>
+          <data-use-chart/>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
-         <SharetopChart/>
+          <SharetopChart/>
         </div>
       </el-col>
     </el-row>
-<!--    <el-row :gutter="8">-->
-<!--      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 8}" style="padding-right:8px;margin-bottom:30px;">-->
-<!--        <transaction-table />-->
-<!--      </el-col>-->
-<!--      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 8}" style="margin-bottom:30px;">-->
-<!--        <todo-list />-->
-<!--      </el-col>-->
-<!--      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 8}" style="margin-bottom:30px;">-->
-<!--        <box-card />-->
-<!--      </el-col>-->
-<!--    </el-row>-->
+    <!--    <el-row :gutter="8">-->
+    <!--      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 8}" style="padding-right:8px;margin-bottom:30px;">-->
+    <!--        <transaction-table />-->
+    <!--      </el-col>-->
+    <!--      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 8}" style="margin-bottom:30px;">-->
+    <!--        <todo-list />-->
+    <!--      </el-col>-->
+    <!--      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 8}" style="margin-bottom:30px;">-->
+    <!--        <box-card />-->
+    <!--      </el-col>-->
+    <!--    </el-row>-->
   </div>
 </template>
 
@@ -107,6 +107,7 @@ import SharetopChart from "@/views/dataCenter/homepage/components/SharetopChart"
 import AssetsChart from "@/views/dataCenter/homepage/components/assets-chart"
 import DataUseChart from "@/views/dataCenter/homepage/components/DataUseChart";
 import TaskStatus from "@/views/dataCenter/homepage/components/TaskStatus";
+
 const lineChartData = {
   newVisitis: {
     expectedData: [100, 120, 161, 134, 105, 160, 165],
@@ -137,7 +138,7 @@ export default {
   // },
   data() {
     return {
-      type:'',
+      type: '',
       lineChartData: lineChartData.newVisitis
     }
   },
@@ -173,7 +174,7 @@ export default {
   }
 }
 
-@media (max-width:1024px) {
+@media (max-width: 1024px) {
   .chart-wrapper {
     padding: 8px;
   }

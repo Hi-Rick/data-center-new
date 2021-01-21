@@ -70,3 +70,26 @@ export function getAssetQuality(data) {
     params: data
   })
 }
+
+export function getResourceDictInfo() {
+  return request({
+    url: '/smartwater/data/data_asset/getAllResourceDirectoryInfo',
+    method: 'get'
+  })
+}
+
+// 获取所有资源分类
+export function getDataCategory() {
+  return request({
+    url: '/smartwater/data/data_asset/getAllDataCategory',
+    method: 'post'
+  })
+}
+
+// 查询数据资产目录第一级结构
+export function getAssetFirst() {
+  return request({
+    url: '/smartwater/data/data_asset/getAssetTreeListFirst',
+    method: 'get'
+  })
+}
