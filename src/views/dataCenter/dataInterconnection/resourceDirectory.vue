@@ -6,13 +6,18 @@
           {{ scope.$index + (currentPage - 1) * pagesize + 1 }}
         </template>
       </el-table-column>
-      <el-table-column label="数据含义" align="center" prop="dataMeaning" />
-      <el-table-column label="数据分类" align="center" prop="dataCategory" />
-      <el-table-column label="数据类型" align="center" prop="dataType" />
-      <el-table-column label="具体内容" align="center" prop="dataDetailInfo" />
-      <el-table-column label="更新频率" align="center" prop="updateFrequency" />
-      <el-table-column label="开放方式" align="center" prop="openMode" />
-      <el-table-column label="责任方" align="center" prop="responsibleParty" />
+      <el-table-column label="数据含义" align="center" prop="dataMeaning"/>
+      <el-table-column label="数据分类" align="center" prop="dataCategory"/>
+      <el-table-column label="数据类型" align="center" prop="dataType"/>
+      <el-table-column label="具体内容" align="center" prop="dataDetailInfo"/>
+      <el-table-column label="更新频率" align="center" prop="updateFrequency"/>
+      <el-table-column label="开放方式" align="center" prop="openMode"/>
+      <el-table-column label="责任方" align="center" prop="responsibleParty"/>
+      <el-table-column label="修改" align="center">
+        <template slot-scope="scope">
+          <el-button type="warning" size="small" icon="el-icon-edit" @click="editDict(scope.row)">修改</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div style="text-align: center; margin-top: 10px; ">
       <el-pagination
@@ -21,50 +26,43 @@
         :current-page="currentPage"
         :page-size="pagesize"
         layout="total,prev,pager,next"
-        :total="resourceList.length" >
+        :total="resourceList.length">
       </el-pagination>
     </div>
-<!--    <el-dialog :visible.sync="openinfo" title="新增资源">-->
-<!--      <el-form ref="form" :model="form" label-width="100px">-->
-<!--        <el-form-item label="资源名称">-->
-<!--          <el-input v-model="form.name"/>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="资源类型">-->
-<!--          <el-input v-model="form.companies"/>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="所属部门">-->
-<!--          &lt;!&ndash;            <el-input v-model="form.zhiwu"/>&ndash;&gt;-->
-<!--          <el-input v-model="form.work"/>-->
-<!--        </el-form-item>-->
-<!--        &lt;!&ndash;          <el-form-item label="证明人">&ndash;&gt;-->
-<!--        &lt;!&ndash;            <el-input v-model="form.witness"/>&ndash;&gt;-->
-<!--        &lt;!&ndash;          </el-form-item>&ndash;&gt;-->
-<!--        <el-form-item label="创建时间">-->
-<!--          <el-col :span="11">-->
-<!--            <el-date-picker v-model="form.btime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"-->
-<!--                            placeholder="选择日期" style="width: 60%;"/>-->
-<!--          </el-col>-->
-<!--        </el-form-item>-->
-<!--        &lt;!&ndash;          <el-form-item label="结束时间">&ndash;&gt;-->
-<!--        &lt;!&ndash;            <el-col :span="11">&ndash;&gt;-->
-<!--        &lt;!&ndash;              <el-date-picker v-model="form.endtime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date"&ndash;&gt;-->
-<!--        &lt;!&ndash;                              placeholder="选择日期" style="width: 60%;"/>&ndash;&gt;-->
-<!--        &lt;!&ndash;            </el-col>&ndash;&gt;-->
-<!--        &lt;!&ndash;          </el-form-item>&ndash;&gt;-->
-<!--        <el-form-item label="备注">-->
-<!--          <el-input v-model="form.beizhu"/>-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <div slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="openinfo = false">取 消</el-button>-->
-<!--        <el-button type="primary" @click="submit">确 定</el-button>-->
-<!--      </div>-->
-<!--    </el-dialog>-->
+    <el-dialog :visible.sync="edit" title="修改信息" width="500px">
+      <el-form ref="form" :model="currentDict" label-width="90px">
+        <el-form-item label="数据含义">
+          <el-input v-model="currentDict.dataMeaning" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="数据分类">
+          <el-input v-model="currentDict.dataCategory" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="数据类型">
+          <el-input v-model="currentDict.dataType" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="具体内容">
+          <el-input v-model="currentDict.dataDetailInfo" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="更新频率">
+          <el-input v-model="currentDict.updateFrequency" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="开放方式">
+          <el-input v-model="currentDict.openMode" style="width: 300px; " />
+        </el-form-item>
+        <el-form-item label="责任方">
+          <el-input v-model="currentDict.responsibleParty" style="width: 300px; " />
+        </el-form-item>
+      </el-form>
+      <div style="text-align: center; ">
+        <el-button type="primary" @click="submitEdit">确定</el-button>
+        <el-button @click="edit = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {getResourceDictInfo} from "../../../api";
+import {getResourceDictInfo, updateResourceDict} from "../../../api";
 
 export default {
   name: 'Resourcedirectory',
@@ -73,6 +71,8 @@ export default {
       resourceList: [],
       currentPage: 1,  // 当前页码
       pagesize: 10,  // 每页显示的行数
+      currentDict: {},
+      edit: false
     };
   },
   mounted() {
@@ -86,6 +86,24 @@ export default {
       getResourceDictInfo().then(response => {
         if (response.data.code === 200) {
           this.resourceList = response.data.data;
+        }
+      })
+    },
+    editDict(row) {
+      this.currentDict = row;
+      this.edit = true;
+    },
+    submitEdit() {
+      updateResourceDict(this.currentDict).then(response => {
+        if (response.data.code === 200) {
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          });
+          this.getResourceList();
+          this.edit = false;
+        } else {
+          this.$message.error('修改失败')
         }
       })
     }

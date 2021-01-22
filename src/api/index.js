@@ -78,6 +78,15 @@ export function getResourceDictInfo() {
   })
 }
 
+// 修改数据资源目录
+export function updateResourceDict(data) {
+  return request({
+    url: '/smartwater/data/data_asset/updateResourceDirectory',
+    method: 'post',
+    data
+  })
+}
+
 // 获取所有资源分类
 export function getDataCategory() {
   return request({
